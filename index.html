@@ -19,6 +19,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border-radius: 10px;
         }
+        <img src="profile.jpg" alt="Photo of Brian Sheehy" class="profile-img">
         h1 {
             color: #333;
         }
@@ -37,6 +38,14 @@
         .btn:hover {
             background: #0056b3;
         }
+.profile-img {
+    display: block;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%; /* Makes it circular */
+    margin: 0 auto 20px auto; /* Centers the image */
+    object-fit: cover; /* Ensures the image fills the circle */
+}
     </style>
 </head>
 <body>
