@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Self-Recurring Revenue Projection</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1814;
+    --paper: #f4ede0;
+    --paper-dim: #ebe2d2;
+    --accent: #c8421f;
+    --accent-soft: #e8a591;
+    --green: #3d5a3d;
+    --green-soft: #b8c9b3;
+    --gold: #b8893d;
+    --burn: #b8893d;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Fraunces', Georgia, serif;
+    font-feature-settings: "ss01", "ss02";
+    min-height: 100vh;
+    padding: 24px 18px 60px;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(200,66,31,0.04) 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(61,90,61,0.04) 0%, transparent 40%);
+  }
+
+  .wrap { max-width: 720px; margin: 0 auto; }
+
+  header {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 20px;
+    margin-bottom: 28px;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: clamp(28px, 7vw, 42px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    font-variation-settings: "opsz" 144;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  .sub {
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    opacity: 0.75;
+    max-width: 540px;
+  }
+
+  .controls {
+    background: var(--paper-dim);
+    border: 1.5px solid var(--ink);
+    padding: 22px 18px 20px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .controls::before {
+    content: "INPUTS · TAP ANY NUMBER TO EDIT";
+    position: absolute;
+    top: -9px;
+    left: 16px;
+    background: var(--paper);
+    padding: 0 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    font-weight: 700;
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  @media (max-width: 480px) {
+    .field-grid { grid-template-columns: 1fr; gap: 12px; }
+  }
+
+  .field {
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    padding: 10px 12px;
+  }
+
+  .field-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 4px;
+  }
+
+  .field input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--accent);
+    outline: none;
+    padding: 0;
+  }
+
+  .field input:focus { color: var(--ink); }
+
+  .field-prefix {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+  }
+
+  .field-prefix .pfx {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent);
+    opacity: 0.5;
+  }
+
+  .field-suffix {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    opacity: 0.5;
+    margin-left: 4px;
+  }
+
+  .ramp-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 8px;
+  }
+
+  .ramp-stages {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .ramp-stage {
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    padding: 8px 8px 10px;
+    text-align: center;
+  }
+
+  .ramp-stage .ramp-month {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 2px;
+  }
+
+  .ramp-stage input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--accent);
+    text-align: center;
+    outline: none;
+    padding: 0;
+  }
+
+  .ramp-stage input:focus { color: var(--ink); }
+
+  .ramp-stage .ramp-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    opacity: 0.5;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .headline {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 28px 22px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .headline::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 40%;
+    background: linear-gradient(135deg, transparent 0%, rgba(200,66,31,0.15) 100%);
+    pointer-events: none;
+  }
+
+  .headline-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--accent-soft);
+    margin-bottom: 10px;
+  }
+
+  .headline-value {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: clamp(48px, 14vw, 80px);
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    font-variation-settings: "opsz" 144;
+  }
+
+  .headline-value em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent-soft);
+  }
+
+  .headline-context {
+    margin-top: 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: 0.85;
+    max-width: 460px;
+  }
+
+  .headline.never { background: #4a3520; }
+
+  /* KPI strip below headline */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--ink);
+    margin-bottom: 28px;
+    border: 1px solid var(--ink);
+  }
+
+  .kpi {
+    background: var(--paper-dim);
+    padding: 14px 12px;
+    text-align: center;
+  }
+
+  .kpi-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 4px;
+  }
+
+  .kpi-value {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .kpi-value.negative { color: var(--accent); }
+  .kpi-value.positive { color: var(--green); }
+
+  .kpi-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    opacity: 0.55;
+    margin-top: 2px;
+  }
+
+  .section-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--ink);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .legend {
+    display: flex;
+    gap: 14px;
+    font-size: 9px;
+    text-transform: none;
+    letter-spacing: 0.05em;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .legend span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .legend i {
+    width: 14px;
+    height: 2px;
+    display: inline-block;
+  }
+
+  .chart-wrap {
+    background: var(--paper-dim);
+    border: 1px solid var(--ink);
+    padding: 16px 8px 8px;
+    margin-bottom: 28px;
+  }
+
+  svg.chart {
+    width: 100%;
+    height: 260px;
+    display: block;
+  }
+
+  .table-wrap {
+    border: 1px solid var(--ink);
+    background: var(--paper-dim);
+    margin-bottom: 28px;
+    max-height: 420px;
+    overflow: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    min-width: 640px;
+  }
+
+  th {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 8px 5px;
+    text-align: right;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 9px;
+    position: sticky;
+    top: 0;
+    white-space: nowrap;
+  }
+
+  th:first-child { text-align: left; }
+
+  td {
+    padding: 7px 5px;
+    text-align: right;
+    border-bottom: 1px solid rgba(26,24,20,0.1);
+    white-space: nowrap;
+  }
+
+  td:first-child {
+    text-align: left;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  tr.crossover { background: var(--green-soft); }
+  tr.crossover td:first-child::before { content: "★ "; color: var(--green); }
+
+  tr.preCrossover td.burn-cell { color: var(--burn); font-weight: 700; }
+
+  .insight {
+    border-left: 3px solid var(--accent);
+    padding: 14px 16px;
+    background: var(--paper-dim);
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 14px;
+  }
+
+  .insight strong {
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .insight.green { border-left-color: var(--green); }
+  .insight.green strong { color: var(--green); }
+
+  .footnote {
+    margin-top: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    line-height: 1.6;
+    opacity: 0.55;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type=number] { -moz-appearance: textfield; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Internal Modeling · v3</div>
+  <h1>The <em>burn-down</em> to self-recurring</h1>
+  <p class="sub">Each month, just enough seats are designated "burn seats" (recognized in full) to cover overhead. The rest become "deferred seats" (recognized at $500/mo, building the recurring base). Once deferred recognition alone covers overhead, the burn allocation drops to zero.</p>
+</header>
+
+<div class="controls">
+  <div class="field-grid">
+    <div class="field">
+      <div class="field-label">Annual seat price</div>
+      <div class="field-prefix">
+        <span class="pfx">$</span>
+        <input type="number" id="seatPrice" value="6000" min="0" step="100" inputmode="numeric">
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">Monthly overhead (the nut)</div>
+      <div class="field-prefix">
+        <span class="pfx">$</span>
+        <input type="number" id="overhead" value="30000" min="0" step="500" inputmode="numeric">
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">Alumni monthly price</div>
+      <div class="field-prefix">
+        <span class="pfx">$</span>
+        <input type="number" id="alumniPrice" value="99" min="0" step="1" inputmode="numeric">
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">Alumni conversion</div>
+      <div class="field-prefix">
+        <input type="number" id="alumniRate" value="40" min="0" max="100" step="5" inputmode="numeric">
+        <span class="field-suffix">%</span>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">Sales commission</div>
+      <div class="field-prefix">
+        <input type="number" id="commissionRate" value="15" min="0" max="50" step="1" inputmode="numeric">
+        <span class="field-suffix">% of seat</span>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">Alumni commission</div>
+      <div class="field-prefix">
+        <input type="number" id="alumniCommissionRate" value="0" min="0" max="50" step="1" inputmode="numeric">
+        <span class="field-suffix">% of $/mo</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ramp-title">Sales ramp · new seats per month</div>
+  <div class="ramp-stages">
+    <div class="ramp-stage">
+      <div class="ramp-month">Mo 1–4</div>
+      <input type="number" id="ramp1" value="10" min="0" step="1" inputmode="numeric">
+      <div class="ramp-sub">seats</div>
+    </div>
+    <div class="ramp-stage">
+      <div class="ramp-month">Mo 5–8</div>
+      <input type="number" id="ramp2" value="15" min="0" step="1" inputmode="numeric">
+      <div class="ramp-sub">seats</div>
+    </div>
+    <div class="ramp-stage">
+      <div class="ramp-month">Mo 9+</div>
+      <input type="number" id="ramp3" value="20" min="0" step="1" inputmode="numeric">
+      <div class="ramp-sub">seats</div>
+    </div>
+  </div>
+</div>
+
+<div class="headline" id="headlineBox">
+  <div class="headline-label">CROSSOVER · BURN SEATS DROP TO ZERO</div>
+  <div class="headline-value" id="headlineValue">Month 7</div>
+  <div class="headline-context" id="headlineContext"></div>
+</div>
+
+<div class="kpi-strip">
+  <div class="kpi">
+    <div class="kpi-label">Total burn seats</div>
+    <div class="kpi-value" id="kpiBurn">—</div>
+    <div class="kpi-sub" id="kpiBurnSub">to reach crossover</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Deferred liability at M24</div>
+    <div class="kpi-value" id="kpiDeferred">—</div>
+    <div class="kpi-sub">future service owed</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Net rev at M24</div>
+    <div class="kpi-value" id="kpiNet24">—</div>
+    <div class="kpi-sub" id="kpiNet24Sub">vs. overhead</div>
+  </div>
+</div>
+
+<div class="section-title">
+  <span>Revenue mix vs. overhead</span>
+  <div class="legend">
+    <span><i style="background:var(--burn)"></i>Burn (full)</span>
+    <span><i style="background:var(--accent)"></i>Deferred</span>
+    <span><i style="background:var(--green)"></i>Alumni</span>
+    <span><i style="background:var(--ink)"></i>Overhead</span>
+  </div>
+</div>
+<div class="chart-wrap">
+  <svg class="chart" id="chart" viewBox="0 0 720 260" preserveAspectRatio="none"></svg>
+</div>
+
+<div class="section-title"><span>Month-by-month detail (after commission)</span></div>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Mo</th>
+        <th>New</th>
+        <th>Burn</th>
+        <th>Defer</th>
+        <th>Active Def.</th>
+        <th>Alumni</th>
+        <th>Burn Net</th>
+        <th>Defer Net</th>
+        <th>Alum Net</th>
+        <th>Total Net</th>
+        <th>Def. Liab.</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+
+<div class="insight" id="insight"></div>
+<div class="insight green" id="insightDeferred"></div>
+
+<p class="footnote">Assumptions · Burn seats: $6k recognized + commission expensed in sale month · Deferred seats: $500/mo recognition with commission spread over 12mo · Crossover = month deferred + alumni net revenue covers overhead without burn · Deferred liability = unrecognized portion of deferred seats sold to date</p>
+
+</div>
+
+<script>
+const SEAT_MONTHS = 12;
+const HORIZON = 24;
+const $ = id => document.getElementById(id);
+
+function fmt(n) {
+  const sign = n < 0 ? '-' : '';
+  return sign + '$' + Math.round(Math.abs(n)).toLocaleString();
+}
+
+function fmtK(n) {
+  if (Math.abs(n) >= 1000) return (n/1000).toFixed(1) + 'k';
+  return Math.round(n).toString();
+}
+
+function compute() {
+  const seatPrice = +$('seatPrice').value || 0;
+  const overhead = +$('overhead').value || 0;
+  const alumniPrice = +$('alumniPrice').value || 0;
+  const alumniRate = (+$('alumniRate').value || 0) / 100;
+  const commissionRate = (+$('commissionRate').value || 0) / 100;
+  const alumniCommissionRate = (+$('alumniCommissionRate').value || 0) / 100;
+  const ramp1 = +$('ramp1').value || 0;
+  const ramp2 = +$('ramp2').value || 0;
+  const ramp3 = +$('ramp3').value || 0;
+
+  const seatMonthly = seatPrice / SEAT_MONTHS;
+  const seatCommissionPerMonth = (seatPrice * commissionRate) / SEAT_MONTHS;
+  const burnNetPerSeat = seatPrice * (1 - commissionRate);
+  const alumniCommissionPerMonth = alumniPrice * alumniCommissionRate;
+  const alumniNetPerMonth = alumniPrice - alumniCommissionPerMonth;
+  const seatNetMonthly = seatMonthly - seatCommissionPerMonth;
+
+  const newSeatsBy = m => {
+    if (m <= 4) return ramp1;
+    if (m <= 8) return ramp2;
+    return ramp3;
+  };
+
+  // Track deferred cohorts: at each month c, X deferred seats were sold.
+  // They contribute seatMonthly for 12 months (months c through c+11).
+  // After 12 months, alumniRate % become alumni at alumniPrice/mo.
+  const deferredCohorts = []; // {month, seats}
+  const rows = [];
+  let crossoverMonth = null;
+  let totalBurnSeats = 0;
+  let cumulativeDeferredSold = 0;
+  let cumulativeDeferredRecognized = 0;
+
+  for (let m = 1; m <= HORIZON; m++) {
+    const newSeats = newSeatsBy(m);
+
+    // Compute deferred + alumni net revenue from prior cohorts (BEFORE adding this month's deferred)
+    let activeDeferredSeats = 0;
+    let alumniCount = 0;
+    deferredCohorts.forEach(c => {
+      const monthsSinceSale = m - c.month;
+      if (monthsSinceSale >= 0 && monthsSinceSale < SEAT_MONTHS) {
+        activeDeferredSeats += c.seats;
+      } else if (monthsSinceSale >= SEAT_MONTHS) {
+        alumniCount += c.seats * alumniRate;
+      }
+    });
+
+    const deferredGross = activeDeferredSeats * seatMonthly;
+    const deferredCommission = activeDeferredSeats * seatCommissionPerMonth;
+    const deferredNet = deferredGross - deferredCommission;
+
+    const alumniGross = alumniCount * alumniPrice;
+    const alumniCommissionTotal = alumniCount * alumniCommissionPerMonth;
+    const alumniNet = alumniGross - alumniCommissionTotal;
+
+    const recurringNet = deferredNet + alumniNet;
+    const gapToOverhead = Math.max(0, overhead - recurringNet);
+
+    // How many burn seats needed to cover the gap?
+    // Each burn seat nets burnNetPerSeat in the month sold.
+    let burnSeats = 0;
+    if (gapToOverhead > 0 && burnNetPerSeat > 0) {
+      burnSeats = Math.min(newSeats, Math.ceil(gapToOverhead / burnNetPerSeat));
+    }
+
+    if (crossoverMonth === null && burnSeats === 0 && recurringNet >= overhead && overhead > 0) {
+      crossoverMonth = m;
+    }
+
+    const deferredSeats = newSeats - burnSeats;
+    totalBurnSeats += burnSeats;
+
+    // Add this month's deferred cohort for future months
+    if (deferredSeats > 0) {
+      deferredCohorts.push({ month: m, seats: deferredSeats });
+      cumulativeDeferredSold += deferredSeats * seatPrice;
+    }
+
+    cumulativeDeferredRecognized += deferredGross;
+    const deferredLiability = cumulativeDeferredSold - cumulativeDeferredRecognized;
+
+    const burnGross = burnSeats * seatPrice;
+    const burnCommission = burnSeats * seatPrice * commissionRate;
+    const burnNet = burnGross - burnCommission;
+
+    const totalNet = burnNet + deferredNet + alumniNet;
+
+    rows.push({
+      month: m,
+      newSeats,
+      burnSeats,
+      deferredSeats,
+      activeDeferredSeats,
+      alumniCount: Math.round(alumniCount),
+      burnGross, burnCommission, burnNet,
+      deferredGross, deferredCommission, deferredNet,
+      alumniGross, alumniCommissionTotal, alumniNet,
+      recurringNet,
+      totalNet,
+      deferredLiability,
+      crossover: crossoverMonth === m,
+      preCrossover: crossoverMonth === null
+    });
+  }
+
+  return { rows, crossoverMonth, overhead, totalBurnSeats, seatPrice };
+}
+
+function renderHeadline(data) {
+  const box = $('headlineBox');
+  const val = $('headlineValue');
+  const ctx = $('headlineContext');
+
+  if (data.crossoverMonth) {
+    box.classList.remove('never');
+    val.innerHTML = `Month <em>${data.crossoverMonth}</em>`;
+    const r = data.rows[data.crossoverMonth - 1];
+    ctx.textContent = `From this month forward, every seat sold becomes deferred — building the recurring base instead of paying today's bills. ${r.activeDeferredSeats} active deferred seats${r.alumniCount > 0 ? ` + ${r.alumniCount} alumni` : ''} produce ${fmt(r.recurringNet)}/mo net, covering ${fmt(data.overhead)} overhead.`;
+  } else {
+    box.classList.add('never');
+    val.innerHTML = `Not in <em>24 mo</em>`;
+    const last = data.rows[data.rows.length - 1];
+    ctx.textContent = `At month 24, recurring net is only ${fmt(last.recurringNet)}/mo against ${fmt(data.overhead)} overhead — still need ${last.burnSeats} burn seats. Lift ramp, raise alumni conversion, or trim overhead.`;
+  }
+}
+
+function renderKPIs(data) {
+  $('kpiBurn').textContent = data.totalBurnSeats;
+  $('kpiBurnSub').textContent = data.crossoverMonth
+    ? `${fmt(data.totalBurnSeats * data.seatPrice)} gross burn revenue`
+    : `${fmt(data.totalBurnSeats * data.seatPrice)} so far · still burning`;
+
+  const m24 = data.rows[23];
+  const defEl = $('kpiDeferred');
+  defEl.textContent = fmt(m24.deferredLiability);
+  defEl.className = 'kpi-value';
+
+  const net24El = $('kpiNet24');
+  const cushion = m24.totalNet - data.overhead;
+  net24El.textContent = fmt(m24.totalNet);
+  net24El.className = 'kpi-value ' + (cushion >= 0 ? 'positive' : 'negative');
+  $('kpiNet24Sub').textContent = `${cushion >= 0 ? '+' : ''}${fmt(cushion)} vs. ${fmt(data.overhead)}`;
+}
+
+function renderChart(data) {
+  const svg = $('chart');
+  const W = 720, H = 260;
+  const pad = { l: 50, r: 12, t: 12, b: 24 };
+  const innerW = W - pad.l - pad.r;
+  const innerH = H - pad.t - pad.b;
+
+  // Stacked: burn net + deferred net + alumni net
+  const totals = data.rows.map(r => r.burnNet + r.deferredNet + r.alumniNet);
+  const maxRev = Math.max(data.overhead, ...totals, 1) * 1.1;
+  const x = m => pad.l + ((m - 1) / (HORIZON - 1)) * innerW;
+  const y = v => pad.t + innerH - (v / maxRev) * innerH;
+  const barW = (innerW / HORIZON) * 0.78;
+
+  let html = '';
+
+  // grid
+  for (let i = 0; i <= 4; i++) {
+    const v = (maxRev / 4) * i;
+    const yy = y(v);
+    html += `<line x1="${pad.l}" y1="${yy}" x2="${W - pad.r}" y2="${yy}" stroke="#1a1814" stroke-opacity="0.08" stroke-width="1"/>`;
+    html += `<text x="${pad.l - 6}" y="${yy + 3}" text-anchor="end" font-family="JetBrains Mono" font-size="9" fill="#1a1814" opacity="0.55">${(v/1000).toFixed(0)}k</text>`;
+  }
+
+  // overhead line
+  const ohY = y(data.overhead);
+
+  // stacked bars
+  data.rows.forEach(r => {
+    const cx = x(r.month);
+    const bx = cx - barW / 2;
+    let cum = 0;
+
+    // Burn (gold) bottom
+    if (r.burnNet > 0) {
+      const h = (r.burnNet / maxRev) * innerH;
+      html += `<rect x="${bx}" y="${y(cum + r.burnNet)}" width="${barW}" height="${h}" fill="#b8893d" opacity="0.85"/>`;
+      cum += r.burnNet;
+    }
+    // Deferred (red) middle
+    if (r.deferredNet > 0) {
+      const h = (r.deferredNet / maxRev) * innerH;
+      html += `<rect x="${bx}" y="${y(cum + r.deferredNet)}" width="${barW}" height="${h}" fill="#c8421f" opacity="0.85"/>`;
+      cum += r.deferredNet;
+    }
+    // Alumni (green) top
+    if (r.alumniNet > 0) {
+      const h = (r.alumniNet / maxRev) * innerH;
+      html += `<rect x="${bx}" y="${y(cum + r.alumniNet)}" width="${barW}" height="${h}" fill="#3d5a3d" opacity="0.85"/>`;
+    }
+  });
+
+  // overhead line on top
+  html += `<line x1="${pad.l}" y1="${ohY}" x2="${W - pad.r}" y2="${ohY}" stroke="#1a1814" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+
+  // crossover marker
+  if (data.crossoverMonth) {
+    const cx = x(data.crossoverMonth);
+    html += `<line x1="${cx}" y1="${pad.t}" x2="${cx}" y2="${pad.t + innerH}" stroke="#3d5a3d" stroke-width="1" stroke-dasharray="2 3" opacity="0.7"/>`;
+    html += `<text x="${cx}" y="${pad.t + 10}" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#3d5a3d" font-weight="700">M${data.crossoverMonth}</text>`;
+  }
+
+  // x-axis
+  [1, 6, 12, 18, 24].forEach(m => {
+    html += `<text x="${x(m)}" y="${H - 8}" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#1a1814" opacity="0.55">M${m}</text>`;
+  });
+
+  svg.innerHTML = html;
+}
+
+function renderTable(data) {
+  $('tableBody').innerHTML = data.rows.map(r => `
+    <tr class="${r.crossover ? 'crossover' : ''} ${r.preCrossover ? 'preCrossover' : ''}">
+      <td>${r.month}</td>
+      <td>${r.newSeats}</td>
+      <td class="burn-cell">${r.burnSeats}</td>
+      <td>${r.deferredSeats}</td>
+      <td>${r.activeDeferredSeats}</td>
+      <td>${r.alumniCount}</td>
+      <td>${fmt(r.burnNet)}</td>
+      <td>${fmt(r.deferredNet)}</td>
+      <td>${fmt(r.alumniNet)}</td>
+      <td><strong>${fmt(r.totalNet)}</strong></td>
+      <td>${fmt(r.deferredLiability)}</td>
+    </tr>
+  `).join('');
+}
+
+function renderInsight(data) {
+  const el = $('insight');
+  const dl = $('insightDeferred');
+
+  if (!data.crossoverMonth) {
+    el.innerHTML = `<strong>Still burning at month 24.</strong> The deferred + alumni base never reaches escape velocity within the horizon. Most leveraged moves: lift the month-9+ ramp, raise alumni conversion, or trim overhead. Until crossover, every month requires burn seats — meaning you're not actually building the recurring engine, you're treading water.`;
+    dl.style.display = 'none';
+    return;
+  }
+
+  const m = data.crossoverMonth;
+  const r = data.rows[m - 1];
+  const m24 = data.rows[23];
+  const burnRevenueTotal = data.totalBurnSeats * data.seatPrice;
+
+  el.innerHTML = `<strong>The plan in plain English.</strong> For ${m - 1} months, you sell aggressively but designate just enough seats as "burn" to keep the lights on — ${data.totalBurnSeats} total seats producing ${fmt(burnRevenueTotal)} of immediate revenue. The remaining seats stack into deferred recognition, building a recurring base that crosses overhead at month ${m}. From that point on, every seat sold becomes pure recurring fuel — no longer needed to pay today's bills.`;
+
+  dl.innerHTML = `<strong>Watch the deferred liability.</strong> By month 24, you'll have ${fmt(m24.deferredLiability)} of deferred revenue on the books — that's future service you've been paid for but haven't delivered yet. As long as you can keep delivering value to those members through month 12 of their seat, this number is healthy. If sales were to halt entirely, this is also the runway you have to honor outstanding commitments. Treat it as both an asset (cash you've collected) and a discipline (work you owe).`;
+  dl.style.display = '';
+}
+
+function update() {
+  const data = compute();
+  renderHeadline(data);
+  renderKPIs(data);
+  renderChart(data);
+  renderTable(data);
+  renderInsight(data);
+}
+
+['seatPrice','overhead','alumniPrice','alumniRate','commissionRate','alumniCommissionRate','ramp1','ramp2','ramp3'].forEach(id => {
+  const el = $(id);
+  el.addEventListener('input', update);
+  el.addEventListener('focus', () => el.select());
+});
+
+update();
+</script>
+</body>
+</html>
